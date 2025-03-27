@@ -9,7 +9,7 @@ export default function Header() {
 				<Flex justify="space-between" align="center" py={4}>
 					{/* Logo */}
 					<Box>
-						<Image src="/assets/logo.png" alt="HAKK Logo" h="60px" w="auto" />
+						<Image src="/assets/logo.png" alt="HAKK Logo" h="59px" w="auto" />
 					</Box>
 
 					{/* Right Side Auth Buttons */}
