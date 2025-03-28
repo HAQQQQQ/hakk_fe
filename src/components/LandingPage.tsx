@@ -13,7 +13,7 @@ const commonHeadingStyle = {
 	textAlign: "center" as const,
 	fontWeight: "bold",
 	size: "6xl",
-};
+} as const;
 
 const LandingPage = () => {
 	return (
