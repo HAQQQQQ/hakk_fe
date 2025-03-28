@@ -1,9 +1,8 @@
 import { motion } from "framer-motion";
-import { Box, Heading, Text } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 
 // Create motion-enhanced Chakra UI components
 const MotionHeading = motion(Heading);
-const MotionText = motion(Text);
 
 export default function WelcomeMessage({ user }) {
 	return (

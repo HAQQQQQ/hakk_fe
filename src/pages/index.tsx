@@ -1,9 +1,7 @@
 import { SignedIn, SignedOut, useSession, useUser } from "@clerk/nextjs";
 import SurveyForm from "../components/SurveyForm";
 import { useProfile } from "../hooks/useProfile";
-import { motion } from "framer-motion";
 import WelcomeMessage from "../components/WelcomeMessage";
-import { Typography } from "@mui/material";
 import LandingPage from "../components/LandingPage";
 
 export default function Home() {

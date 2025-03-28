@@ -13,15 +13,20 @@ import {
 import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import { useColorModeValue } from "./ui/color-mode";
+import { toast } from "react-toastify";
+import { useMutation } from "@tanstack/react-query";
+import { useUser } from "@clerk/nextjs";
 
 const categories = ["movies", "artists", "hobbies"] as const;
 
 export default function ChatSurvey() {
+	const { user } = useUser();
+
 	const [step, setStep] = useState(0);
 	const [formData, setFormData] = useState<Record<string, string[]>>({
-		movies: [],
-		artists: [],
-		hobbies: [],
+		movies: ["Inception", "Spirited Away", "The Matrix"],
+		artists: ["Taylor Swift", "Kendrick Lamar", "Adele"],
+		hobbies: ["Hiking", "Painting", "Chess"],
 	});
 	const [currentInput, setCurrentInput] = useState("");
 
@@ -47,8 +52,43 @@ export default function ChatSurvey() {
 		setStep(step + 1);
 	};
 
-	const handleSubmit = () => {
-		console.log("Submitting:", formData);
+
+	const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+	const savePreferences = async () => {
+		const payload = {
+			userId: user?.id,
+			preference: formData,
+		};
+
+		const response = await fetch(`${apiUrl}/api/preferences`, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(payload),
+		});
+
+		if (!response.ok) {
+			const errorText = await response.text();
+			throw new Error(errorText || "Failed to save preferences.");
+		}
+
+		return response.json();
+	};
+
+	const { mutate } = useMutation({
+		mutationFn: savePreferences,
+		onSuccess: (data) => {
+			toast.success("Preferences saved!");
+			console.log(data);
+		},
+		onError: (error: any) => {
+			toast.error("Error:", error.message);
+		},
+	});
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		mutate();
 	};
 
 	return (
@@ -144,6 +184,16 @@ export default function ChatSurvey() {
 						</Button>
 					</>
 				)}
+				<Button
+					colorScheme="green"
+					size="lg"
+					borderRadius="full"
+					px={8}
+					fontWeight="bold"
+					onClick={handleSubmit}
+				>
+					✅ Submit Preferences TEST
+				</Button>
 			</VStack>
 		</Container>
 	);
