@@ -10,7 +10,6 @@
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "ignoreBuildErrors": true,
     "jsx": "preserve",
     "incremental": false,
     "skipLibCheck": true,
