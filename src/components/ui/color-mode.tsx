@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-object-type */
+
 "use client";
 
 import type { IconButtonProps, SpanProps } from "@chakra-ui/react";
@@ -43,7 +45,7 @@ export function ColorModeIcon() {
 	return colorMode === "dark" ? <LuMoon /> : <LuSun />;
 }
 
-type ColorModeButtonProps = Omit<IconButtonProps, "aria-label">
+interface ColorModeButtonProps extends Omit<IconButtonProps, "aria-label"> {}
 
 export const ColorModeButton = React.forwardRef<HTMLButtonElement, ColorModeButtonProps>(
 	function ColorModeButton(props, ref) {
