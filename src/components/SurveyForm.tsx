@@ -8,15 +8,19 @@ import {
 	Input,
 	Text,
 	VStack,
-	useBreakpointValue, CardBody
+	useBreakpointValue,
 } from "@chakra-ui/react";
+import {
+	Card,
+	CardHeader,
+	CardBody,
+} from "@chakra-ui/card";
 import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import { useColorModeValue } from "./ui/color-mode";
 import { toast } from "react-toastify";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useUser } from "@clerk/nextjs";
-import { Card, CardHeader, Divider } from "@mui/material";
 
 const categories = ["movies", "artists", "hobbies"] as const;
 
@@ -75,7 +79,7 @@ export default function SurveyForm() {
 		return response.json();
 	};
 
-	const { data, status } = useQuery({
+	const { data } = useQuery({
 		queryKey: ["interests", user?.id],
 		queryFn: async () => {
 			const response = await fetch(`${apiUrl}/api/interests/user/${user?.id}`, {
@@ -217,47 +221,60 @@ export default function SurveyForm() {
 			</VStack>
 
 			{interests && (
-				<h1> { interests.data.interests.music.mood }</h1>
-				// <Card mt={10} boxShadow="lg" borderRadius="xl" bg="white">
-				// 	<CardHeader>
-				// 		<Heading size="lg" color="teal.600">
-				// 			🎯 Your Interest Profile
-				// 		</Heading>
-				// 	</CardHeader>
-				//
-				// 	<Divider />
-				//
-				// 	<CardBody>
-				// 		{/* MUSIC */}
-				// 		<Box mb={6}>
-				// 			<Heading size="md" mb={2} color="teal.500">
-				// 				🎵 Music
-				// 			</Heading>
-				// 			<Text><strong>Mood:</strong> {interests.music.mood}</Text>
-				// 			<Text><strong>Genres:</strong> {interests.music.genres.join(", ")}</Text>
-				// 		</Box>
-				//
-				// 		{/* MOVIES */}
-				// 		<Box mb={6}>
-				// 			<Heading size="md" mb={2} color="teal.500">
-				// 				🎬 Movies
-				// 			</Heading>
-				// 			<Text><strong>Genres:</strong> {interests.movies.genres.join(", ")}</Text>
-				// 			<Text><strong>Time Periods:</strong> {interests.movies.time_periods.join(", ")}</Text>
-				// 			<Text><strong>Cultural Context:</strong> {interests.movies.cultural_context.join(", ")}</Text>
-				// 		</Box>
-				//
-				// 		{/* HOBBIES */}
-				// 		<Box>
-				// 			<Heading size="md" mb={2} color="teal.500">
-				// 				⛰️ Hobbies
-				// 			</Heading>
-				// 			<Text><strong>Lifestyle:</strong> {interests.hobbies.lifestyle}</Text>
-				// 			<Text><strong>Personality:</strong> {interests.hobbies.personality}</Text>
-				// 			<Text><strong>Activities:</strong> {interests.hobbies.related_activities.join(", ")}</Text>
-				// 		</Box>
-				// 	</CardBody>
-				// </Card>
+				<Card mt={10} boxShadow="lg" borderRadius="xl" bg="white">
+					<CardHeader>
+						<Heading size="lg" color="teal.600">
+							🎯 Your Interest Profile
+						</Heading>
+					</CardHeader>
+
+					<CardBody>
+						{/* MUSIC */}
+						<Box mb={6}>
+							<Heading size="md" mb={2} color="teal.500">
+								🎵 Music
+							</Heading>
+							<Text>
+								<Text as="span" fontWeight="bold">Mood:</Text> {interests.data.interests.music.mood}
+							</Text>
+							<Text>
+								<Text as="span" fontWeight="bold">Genres:</Text> {interests.data.interests.music.genres.join(", ")}
+							</Text>
+						</Box>
+
+						{/* MOVIES */}
+						<Box mb={6}>
+							<Heading size="md" mb={2} color="teal.500">
+								🎬 Movies
+							</Heading>
+							<Text>
+								<Text as="span" fontWeight="bold">Genres:</Text> {interests.data.interests.movies.genres.join(", ")}
+							</Text>
+							<Text>
+								<Text as="span" fontWeight="bold">Time Periods:</Text> {interests.data.interests.movies.time_periods.join(", ")}
+							</Text>
+							<Text>
+								<Text as="span" fontWeight="bold">Cultural Context:</Text> {interests.data.interests.movies.cultural_context.join(", ")}
+							</Text>
+						</Box>
+
+						{/* HOBBIES */}
+						<Box>
+							<Heading size="md" mb={2} color="teal.500">
+								⛰️ Hobbies
+							</Heading>
+							<Text>
+								<Text as="span" fontWeight="bold">Lifestyle:</Text> {interests.data.interests.hobbies.lifestyle}
+							</Text>
+							<Text>
+								<Text as="span" fontWeight="bold">Personality:</Text> {interests.data.interests.hobbies.personality}
+							</Text>
+							<Text>
+								<Text as="span" fontWeight="bold">Activities:</Text> {interests.data.interests.hobbies.related_activities.join(", ")}
+							</Text>
+						</Box>
+					</CardBody>
+				</Card>
 			)}
 
 		</Container>
