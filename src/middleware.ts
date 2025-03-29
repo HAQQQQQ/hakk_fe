@@ -1,6 +1,26 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { clerkMiddleware, auth } from "@clerk/nextjs/server";
+import { clerkClient } from "@clerk/clerk-sdk-node";
+import { NextResponse } from "next/server";
 
-export default clerkMiddleware();
+export default clerkMiddleware(async (auth, req) => {
+	const { userId } = await auth();
+
+	// Only run redirect logic on logged-in users and non-API routes
+	if (
+		userId &&
+		!req.nextUrl.pathname.startsWith("/api") &&
+		req.nextUrl.pathname !== "/select-metadata"
+	) {
+		const user = await clerkClient.users.getUser(userId);
+		const hasRole = !!user.publicMetadata?.role;
+
+		if (!hasRole) {
+			const url = req.nextUrl.clone();
+			url.pathname = "/select-metadata";
+			return NextResponse.redirect(url);
+		}
+	}
+});
 
 export const config = {
 	matcher: [

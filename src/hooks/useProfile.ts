@@ -24,6 +24,7 @@ export function useProfile(user: any, session: any) {
 				email: user.primaryEmailAddress?.emailAddress,
 				full_name: `${user.firstName} ${user.lastName}`,
 				avatar_url: user.imageUrl,
+				// role: user.publicMetaData.role, // PARTICIPANT OR COORDINATOR
 			};
 
 			if (existingProfile && existingProfile.length > 0) {
