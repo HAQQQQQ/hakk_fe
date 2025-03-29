@@ -221,9 +221,9 @@ export default function SurveyForm() {
 			</VStack>
 
 			{interests && (
-				<Card mt={10} boxShadow="lg" borderRadius="xl" bg="white">
+				<Card mt={10} boxShadow="lg" borderRadius="xl" bg="black">
 					<CardHeader>
-						<Heading size="lg" color="teal.600">
+						<Heading size="lg" color="black.600">
 							🎯 Your Interest Profile
 						</Heading>
 					</CardHeader>
