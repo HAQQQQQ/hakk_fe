@@ -25,13 +25,24 @@ export default function SelectRolePage() {
         if (!role) return;
         setSubmitting(true);
 
-        await fetch('/api/set-user-metadata', {
+        const res = await fetch('/api/set-user-metadata', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ role }),
         });
 
-        router.push('/');
+        if (res.ok) {
+            // Assuming the API returns a role or some identifier
+            if (role === 'coordinator') {
+                router.push('/coordinator');
+            } else if (role === 'participant') {
+                router.push('/participant');
+            } else {
+                router.push('/'); // Fallback
+            }
+        } else {
+            console.error('Failed to set user metadata');
+        }
     };
 
     return (

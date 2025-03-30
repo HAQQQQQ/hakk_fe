@@ -1,28 +1,31 @@
-import { SignedIn, SignedOut, useSession, useUser } from "@clerk/nextjs";
-import SurveyForm from "../components/SurveyForm";
-import { useProfile } from "../hooks/useProfile";
-import WelcomeMessage from "../components/WelcomeMessage";
+import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import LandingPage from "../components/LandingPage";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-	// Get Clerk session and user details
-	const { session } = useSession();
 	const { user } = useUser();
+	const router = useRouter();
 
-	// Use the custom hook to upsert the profile
-	useProfile(user, session);
+	useEffect(() => {
+		if (user?.publicMetadata?.role === "participant") {
+			router.push("/participant");
+		} else if (user?.publicMetadata?.role === "coordinator") {
+			router.push("/coordinator");
+		}
+	}, [user, router]);
+
 
 	return (
 		<div>
 			<main>
-				<SignedIn>
-					<WelcomeMessage user={user}></WelcomeMessage>
-					<SurveyForm />
-				</SignedIn>
-				{/* Hero Section */}
 				<SignedOut>
-					<LandingPage></LandingPage>
+					<LandingPage />
 				</SignedOut>
+				{/* You can even show a loader or splash screen briefly while redirecting */}
+				<SignedIn>
+					<p>Redirecting...</p>
+				</SignedIn>
 			</main>
 		</div>
 	);

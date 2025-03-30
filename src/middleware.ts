@@ -11,40 +11,14 @@ export default clerkMiddleware(async (auth, req) => {
 	const pathname = req.nextUrl.pathname;
 	console.log("Request pathname:", pathname);
 
-	if (
-		userId &&
-		!pathname.startsWith("/api") &&
-		!["/select-metadata", "/unauthorized", "/", "/event-portal"].includes(pathname)
-	) {
+	if (userId) {
 		const user = await clerkClient.users.getUser(userId);
 		const role = user.publicMetadata?.role;
 		console.log("User role:", role);
 
-		if (!role) {
-			console.log("No role found. Redirecting to /select-metadata");
+		if (userId && !role && !pathname.startsWith("/select-metadata")) {
 			const url = req.nextUrl.clone();
 			url.pathname = "/select-metadata";
-			return NextResponse.redirect(url);
-		}
-
-		if (role === "participant" && pathname !== "/") {
-			console.log("Participant not on '/', redirecting...");
-			const url = req.nextUrl.clone();
-			url.pathname = "/";
-			return NextResponse.redirect(url);
-		}
-
-		if (role === "coordinator" && pathname !== "/event-portal") {
-			console.log("Coordinator not on '/event-portal', redirecting...");
-			const url = req.nextUrl.clone();
-			url.pathname = "/event-portal";
-			return NextResponse.redirect(url);
-		}
-
-		if (!["participant", "coordinator"].includes(String(role)) && pathname !== "/unauthorized") {
-			console.log("Unknown role, redirecting to /unauthorized");
-			const url = req.nextUrl.clone();
-			url.pathname = "/unauthorized";
 			return NextResponse.redirect(url);
 		}
 	}

@@ -1,9 +1,8 @@
-// app/admin/event-portal/page.tsx
 "use client";
 
 import { useState } from "react";
 
-export default function EventPortal() {
+export default function Coordinator() {
     const [events, setEvents] = useState([
         {
             id: 1,
