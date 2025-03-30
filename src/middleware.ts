@@ -1,25 +1,56 @@
-import { clerkMiddleware, auth } from "@clerk/nextjs/server";
+import { clerkMiddleware } from "@clerk/nextjs/server";
 import { clerkClient } from "@clerk/clerk-sdk-node";
 import { NextResponse } from "next/server";
 
 export default clerkMiddleware(async (auth, req) => {
-	const { userId } = await auth();
+	console.log("Middleware triggered");
 
-	// Only run redirect logic on logged-in users and non-API routes
+	const { userId } = await auth();
+	console.log("User ID:", userId);
+
+	const pathname = req.nextUrl.pathname;
+	console.log("Request pathname:", pathname);
+
 	if (
 		userId &&
-		!req.nextUrl.pathname.startsWith("/api") &&
-		req.nextUrl.pathname !== "/select-metadata"
+		!pathname.startsWith("/api") &&
+		!["/select-metadata", "/unauthorized", "/", "/event-portal"].includes(pathname)
 	) {
 		const user = await clerkClient.users.getUser(userId);
-		const hasRole = !!user.publicMetadata?.role;
+		const role = user.publicMetadata?.role;
+		console.log("User role:", role);
 
-		if (!hasRole) {
+		if (!role) {
+			console.log("No role found. Redirecting to /select-metadata");
 			const url = req.nextUrl.clone();
 			url.pathname = "/select-metadata";
 			return NextResponse.redirect(url);
 		}
+
+		if (role === "participant" && pathname !== "/") {
+			console.log("Participant not on '/', redirecting...");
+			const url = req.nextUrl.clone();
+			url.pathname = "/";
+			return NextResponse.redirect(url);
+		}
+
+		if (role === "coordinator" && pathname !== "/event-portal") {
+			console.log("Coordinator not on '/event-portal', redirecting...");
+			const url = req.nextUrl.clone();
+			url.pathname = "/event-portal";
+			return NextResponse.redirect(url);
+		}
+
+		if (!["participant", "coordinator"].includes(String(role)) && pathname !== "/unauthorized") {
+			console.log("Unknown role, redirecting to /unauthorized");
+			const url = req.nextUrl.clone();
+			url.pathname = "/unauthorized";
+			return NextResponse.redirect(url);
+		}
 	}
+
+	console.log("Middleware passed, continuing request");
+	return NextResponse.next();
 });
 
 export const config = {
