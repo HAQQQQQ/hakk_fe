@@ -109,7 +109,6 @@ export default function SelectRolePage() {
                 colorScheme="blue"
                 width="full"
                 onClick={handleSubmit}
-                isLoading={submitting}
                 loadingText="Saving..."
             >
                 Continue
