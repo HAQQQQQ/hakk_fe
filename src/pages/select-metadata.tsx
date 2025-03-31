@@ -24,7 +24,6 @@ export default function SelectRolePage() {
     const router = useRouter();
     const { user, isLoaded } = useUser();
     const [role, setRole] = useState('');
-    const [submitting, setSubmitting] = useState(false);
 
     const setRoleStub = (role: string) => {
         console.log(role);
@@ -40,7 +39,6 @@ export default function SelectRolePage() {
 
     const handleSubmit = async () => {
         if (!role) return;
-        setSubmitting(true);
 
         const res = await fetch('/api/set-user-metadata', {
             method: 'POST',
