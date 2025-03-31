@@ -203,16 +203,6 @@ export default function SurveyForm() {
 						</Button>
 					</>
 				)}
-				<Button
-					colorScheme="green"
-					size="lg"
-					borderRadius="full"
-					px={8}
-					fontWeight="bold"
-					onClick={handleSubmit}
-				>
-					✅ Submit Preferences TEST
-				</Button>
 			</VStack>
 
 			{interests && (
