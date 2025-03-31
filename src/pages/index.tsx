@@ -2,6 +2,7 @@ import { SignedIn, SignedOut, useUser } from "@clerk/nextjs";
 import LandingPage from "../components/LandingPage";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { Flex, Spinner } from "@chakra-ui/react";
 
 export default function Home() {
 	const { user } = useUser();
@@ -22,9 +23,10 @@ export default function Home() {
 				<SignedOut>
 					<LandingPage />
 				</SignedOut>
-				{/* You can even show a loader or splash screen briefly while redirecting */}
 				<SignedIn>
-					<p>Redirecting...</p>
+					<Flex align="center" justify="center" height="100vh">
+						<Spinner size="xl" color="teal.500" />
+					</Flex>
 				</SignedIn>
 			</main>
 		</div>
