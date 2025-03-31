@@ -10,11 +10,6 @@ import {
 	VStack,
 	useBreakpointValue,
 } from "@chakra-ui/react";
-import {
-	Card,
-	CardHeader,
-	CardBody,
-} from "@chakra-ui/card";
 import "react-toastify/dist/ReactToastify.css";
 import { useState } from "react";
 import { useColorModeValue } from "./ui/color-mode";
