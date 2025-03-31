@@ -66,7 +66,7 @@ const LandingPage = () => {
 				as="h1"
 				{...commonHeadingStyle}
 				initial={{ opacity: 0.2, y: headingY }}
-				animate={{ opacity: 1, y: headingY + headingYOffset}}
+				animate={{ opacity: 1, y: (headingY ?? 0) + (headingYOffset ?? 0)}}
 				transition={{ duration: 3 }}
 				viewport={{ once: true }}
 			>
@@ -77,7 +77,7 @@ const LandingPage = () => {
 				as="h1"
 				{...commonHeadingStyle}
 				initial={{ opacity: 0.2, y: headingY }}
-				animate={{ opacity: 1, y: headingY + headingYOffset + 30}}
+				animate={{ opacity: 1, y: (headingY ?? 0) + (headingYOffset ?? 0) + 30}}
 				transition={{ duration: 1, delay: 0.3 }}
 				viewport={{ once: true }}
 			>
