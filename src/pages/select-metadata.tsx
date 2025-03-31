@@ -3,6 +3,22 @@
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
+import {
+    Box,
+    Button,
+    Heading,
+    Text,
+    Portal,
+    Select,
+    createListCollection,
+} from '@chakra-ui/react';
+
+const roleCollection = createListCollection({
+    items: [
+        { label: 'Participant', value: 'participant' },
+        { label: 'Coordinator', value: 'coordinator' },
+    ],
+});
 
 export default function SelectRolePage() {
     const router = useRouter();
@@ -10,15 +26,16 @@ export default function SelectRolePage() {
     const [role, setRole] = useState('');
     const [submitting, setSubmitting] = useState(false);
 
+    const setRoleStub = (role: string) => {
+        console.log(role);
+        setRole(role);
+    }
+
+
     useEffect(() => {
         if (!isLoaded) return;
-
         const hasRole = user?.publicMetadata?.role;
-
-        if (hasRole) {
-            // Skip if already set
-            router.replace('/');
-        }
+        if (hasRole) router.replace('/');
     }, [isLoaded, user, router]);
 
     const handleSubmit = async () => {
@@ -31,44 +48,74 @@ export default function SelectRolePage() {
             body: JSON.stringify({ role }),
         });
 
+        debugger;
+
         if (res.ok) {
-            // Assuming the API returns a role or some identifier
-            if (role === 'coordinator') {
-                router.push('/coordinator');
-            } else if (role === 'participant') {
-                router.push('/participant');
-            } else {
-                router.push('/'); // Fallback
-            }
+            router.push(role === 'coordinator' ? '/coordinator' : '/participant');
         } else {
             console.error('Failed to set user metadata');
         }
     };
 
     return (
-        <div className="max-w-md mx-auto mt-20 p-4 border rounded shadow space-y-4">
-            <h1 className="text-xl font-bold text-center">Select Role</h1>
+        <Box maxW="3xl" mx="auto" mt="20" p="4" borderWidth="1px" borderRadius="md" shadow="md">
+            <Heading as="h1" size="lg" textAlign="center" mb="6">
+                Select Role
+            </Heading>
 
-            <div>
-                <label className="block font-medium mb-1">Role</label>
-                <select
-                    className="w-full p-2 border rounded"
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
+            <Box mb="4">
+                <Text mb="2" fontWeight="medium">Role</Text>
+                <Select.Root
+                    collection={roleCollection}
+                    onValueChange={(val) => setRoleStub(String(val.value))}
+                    size="lg"
+                    width="100%"
                 >
-                    <option value="">Select role</option>
-                    <option value="participant">Participant</option>
-                    <option value="coordinator">Coordinator</option>
-                </select>
-            </div>
+                    <Select.HiddenSelect />
+                    <Select.Control>
+                        <Select.Trigger>
+                            <Select.ValueText placeholder="Select role" />
+                        </Select.Trigger>
+                        <Select.IndicatorGroup>
+                            <Select.Indicator />
+                        </Select.IndicatorGroup>
+                    </Select.Control>
+                    <Portal>
+                        <Select.Positioner>
+                            <Select.Content
+                                bg="black"
+                                color="white"
+                                border="1px solid"
+                                borderColor="gray.600"
+                                borderRadius="md"
+                                shadow="md"
+                            >
+                                {roleCollection.items.map((item) => (
+                                    <Select.Item
+                                        key={item.value}
+                                        item={item}
+                                        _hover={{ bg: 'gray.700' }}
+                                        _selected={{ bg: 'gray.800', fontWeight: 'bold' }}
+                                    >
+                                        {item.label}
+                                        <Select.ItemIndicator />
+                                    </Select.Item>
+                                ))}
+                            </Select.Content>
+                        </Select.Positioner>
+                    </Portal>
+                </Select.Root>
+            </Box>
 
-            <button
-                className="w-full bg-blue-600 text-white py-2 rounded disabled:opacity-50"
+            <Button
+                colorScheme="blue"
+                width="full"
                 onClick={handleSubmit}
-                disabled={!role || submitting}
+                isLoading={submitting}
+                loadingText="Saving..."
             >
-                {submitting ? 'Saving...' : 'Continue'}
-            </button>
-        </div>
+                Continue
+            </Button>
+        </Box>
     );
 }

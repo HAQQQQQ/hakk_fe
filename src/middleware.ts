@@ -16,10 +16,14 @@ export default clerkMiddleware(async (auth, req) => {
 		const role = user.publicMetadata?.role;
 		console.log("User role:", role);
 
-		if (userId && !role && !pathname.startsWith("/select-metadata")) {
-			const url = req.nextUrl.clone();
-			url.pathname = "/select-metadata";
-			return NextResponse.redirect(url);
+		if (
+			userId && !role
+			&& !pathname.startsWith("/select-metadata")
+			&& !pathname.startsWith("/api"))
+		{
+				const url = req.nextUrl.clone();
+				url.pathname = "/select-metadata";
+				return NextResponse.redirect(url);
 		}
 	}
 
