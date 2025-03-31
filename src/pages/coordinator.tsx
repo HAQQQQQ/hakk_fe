@@ -50,7 +50,7 @@ export default function Coordinator() {
 
     return (
         <Container maxW="6xl" py={10}>
-            <VStack align="stretch" spacing={6}>
+            <VStack align="stretch">
                 <Heading size="4xl" textAlign="center" color="gray.800" mb={4}>
                     📅 Event Portal
                 </Heading>
