@@ -1,278 +1,134 @@
 "use client";
 
-import {
-	Box,
-	Button,
-	Container,
-	Heading,
-	Input,
-	Text,
-	VStack,
-	useBreakpointValue,
-} from "@chakra-ui/react";
-import "react-toastify/dist/ReactToastify.css";
-import { useState } from "react";
-import { useColorModeValue } from "./ui/color-mode";
-import { toast } from "react-toastify";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { useUser } from "@clerk/nextjs";
+import { Box, Button, Container, Flex, Input, Text, VStack } from "@chakra-ui/react";
+import { useState, useEffect, useRef } from "react";
+import { useColorModeValue } from "@/components/ui/color-mode";
 
-const categories = ["movies", "artists", "hobbies"] as const;
+interface Message {
+	sender: "bot" | "user";
+	text: string;
+}
 
-export default function SurveyForm() {
-	const { user } = useUser();
+const randomResponses = [
+	"That's fascinating!",
+	"I never knew that.",
+	"Tell me more.",
+	"Really interesting perspective.",
+	"Wow, that's cool!",
+	"Hmm, intriguing.",
+	"Oh, I see."
+];
 
-	const [step, setStep] = useState(0);
-	const [formData, setFormData] = useState<Record<string, string[]>>({
-		movies: ["Inception", "Spirited Away", "The Matrix"],
-		artists: ["Taylor Swift", "Kendrick Lamar", "Adele"],
-		hobbies: ["Hiking", "Painting", "Chess"],
-	});
-	const [currentInput, setCurrentInput] = useState("");
+export default function ChatBotDesktop() {
+	const [messages, setMessages] = useState<Message[]>([]);
+	const [input, setInput] = useState("");
+	const [isTyping, setIsTyping] = useState(false);
+	const [botTyping, setBotTyping] = useState("");
 
-	const currentCategory = categories[Math.floor(step / 3)];
-	const isFinalStep = step >= categories.length * 3;
+	// Type the interval reference appropriately
+	const typingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-	const bgColor = useColorModeValue("gray.100", "white.900");
-	const chatBubbleBg = useColorModeValue("gray.100", "white.700");
-	const accentColor = "black.800";
+	// Type the chat container reference to HTMLDivElement
+	const chatContainerRef = useRef<HTMLDivElement>(null);
 
-	const promptFontSize = useBreakpointValue({ base: "xl", md: "2xl" });
+	const handleSend = () => {
+		if (!input.trim()) return;
 
-	const handleNext = () => {
-		if (!currentInput.trim()) return;
+		// Append user's message
+		setMessages((prev: Message[]) => [...prev, { sender: "user", text: input }]);
+		setInput("");
 
-		const category = currentCategory;
-		setFormData((prev) => ({
-			...prev,
-			[category]: [...prev[category], currentInput],
-		}));
+		// Simulate API call delay and typing animation
+		setIsTyping(true);
+		setTimeout(() => {
+			const response = randomResponses[Math.floor(Math.random() * randomResponses.length)];
+			let index = 0;
+			setBotTyping("");
 
-		setCurrentInput("");
-		setStep(step + 1);
+			typingIntervalRef.current = setInterval(() => {
+				setBotTyping((prev) => {
+					const newText = response.slice(0, index + 1);
+					index++;
+					if (index === response.length) {
+						if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
+						// Append the completed bot message to the conversation
+						setMessages((prevMessages: Message[]) => [...prevMessages, { sender: "bot", text: newText }]);
+						setBotTyping("");
+						setIsTyping(false);
+					}
+					return newText;
+				});
+			}, 50);
+		}, 1000);
 	};
 
-	const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-
-	const savePreferences = async () => {
-		const payload = {
-			userId: user?.id,
-			preference: formData,
-		};
-
-		const response = await fetch(`${apiUrl}/api/preferences`, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(payload),
-		});
-
-		if (!response.ok) {
-			const errorText = await response.text();
-			throw new Error(errorText || "Failed to save preferences.");
+	// Auto-scroll to the bottom when new messages or typing animation updates occur
+	useEffect(() => {
+		if (chatContainerRef.current) {
+			chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
 		}
+	}, [messages, botTyping]);
 
-		return response.json();
+	const botBubbleStyles = {
+		alignSelf: "flex-start",
+		bg: useColorModeValue("gray.300", "gray.600"),
+		color: useColorModeValue("black", "white"),
+		p: 3,
+		borderRadius: "md",
+		maxW: "80%",
+		mb: 2,
 	};
 
-	const { data } = useQuery({
-		queryKey: ["interests", user?.id],
-		queryFn: async () => {
-			const response = await fetch(`${apiUrl}/api/interests/user/${user?.id}`, {
-				method: "GET",
-				headers: { "Content-Type": "application/json" },
-			});
-
-			if (!response.ok) {
-				const errorText = await response.text();
-				throw new Error(errorText || "Failed to fetch preferences.");
-			}
-
-			return response.json();
-		},
-		enabled: !!user?.id,
-	});
-
-	const interests = data?.data
-
-	const { mutate } = useMutation({
-		mutationFn: savePreferences,
-		onSuccess: (data) => {
-			toast.success("Preferences saved!");
-			console.log(data);
-		},
-		onError: (error: any) => {
-			toast.error("Error:", error.message);
-		},
-	});
-
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-		mutate();
+	const userBubbleStyles = {
+		alignSelf: "flex-end",
+		bg: useColorModeValue("gray.600", "gray.800"),
+		color: "white",
+		p: 3,
+		borderRadius: "md",
+		maxW: "80%",
+		mb: 2,
 	};
 
 	return (
-		<Container maxW="6xl" py={10}>
-			<VStack align="stretch" p={8} bg={bgColor} borderRadius="2xl" boxShadow="lg">
-				<Heading size="3xl" textAlign="center" color="black" letterSpacing="wide">
-					🎤 Let’s get to know you!
-				</Heading>
-
-				{!isFinalStep && (
-					<>
-						<Box
-							bg={chatBubbleBg}
-							borderRadius="lg"
-							p={5}
-							boxShadow="sm"
-							borderLeft="6px solid"
-							borderColor={accentColor}
-							display="flex"
-							alignItems="center"
-						>
-							<Text fontSize={promptFontSize} fontWeight="semibold" color="gray.700">
-								{`What's one of your favorite ${currentCategory}?`}
-							</Text>
-							<Text fontSize="sm" color="gray.500" ml={2}>
-								({formData[currentCategory].length + 1}/3)
-							</Text>
-						</Box>
-
-						<Input
-							placeholder={`Type a ${currentCategory.slice(0, -1)}...`}
-							value={currentInput}
-							onChange={(e) => setCurrentInput(e.target.value)}
-							onKeyDown={(e) => e.key === "Enter" && handleNext()}
-							size="lg"
-							bg="white"
-							borderRadius="full"
-							boxShadow="sm"
-							px={6}
-							py={5}
-						/>
-
-						<Button
-							variant="ghost"
-							onClick={handleNext}
-							colorScheme="teal"
-							size="2xl"
-							borderRadius="full"
-							px={8}
-							fontWeight="bold"
-						>
-							Next →
-						</Button>
-					</>
-				)}
-
-				{isFinalStep && (
-					<>
-						<Box
-							bg={chatBubbleBg}
-							borderRadius="lg"
-							p={6}
-							boxShadow="sm"
-							borderLeft="6px solid"
-							borderColor={accentColor}
-						>
-							<Text fontSize="2xl" fontWeight="bold" mb={2}>
-								🎉 Youre all done!
-							</Text>
-							<Text fontSize="md" mb={4}>
-								Here’s what you picked:
-							</Text>
-
-							{categories.map((cat) => (
-								<Box key={cat} mb={2}>
-									<Text fontWeight="semibold" color="black.600">
-										{cat.charAt(0).toUpperCase() + cat.slice(1)}:
-									</Text>
-									<Text color="gray.700">{formData[cat].join(", ")}</Text>
-								</Box>
-							))}
-						</Box>
-
-						<Button
-							colorScheme="green"
-							size="lg"
-							borderRadius="full"
-							px={8}
-							fontWeight="bold"
-							onClick={handleSubmit}
-						>
-							✅ Submit Preferences
-						</Button>
-					</>
-				)}
-			</VStack>
-
-			{interests && (
-				<Container maxW="4xl" mt={10}>
-					<Box
+		<Container maxW="800px" py={8}>
+			<Box
+				bg={useColorModeValue("gray.50", "gray.900")}
+				borderRadius="lg"
+				boxShadow="lg"
+				p={4}
+				height="600px"
+				display="flex"
+				flexDirection="column"
+			>
+				<Box ref={chatContainerRef} flex="1" overflowY="auto" mb={4} px={2}>
+					<VStack align="stretch">
+						{messages.map((msg, i) => (
+							<Box key={i} {...(msg.sender === "bot" ? botBubbleStyles : userBubbleStyles)}>
+								<Text>{msg.text}</Text>
+							</Box>
+						))}
+						{isTyping && (
+							<Box {...botBubbleStyles}>
+								<Text>{botTyping || "..."}</Text>
+							</Box>
+						)}
+					</VStack>
+				</Box>
+				<Flex as="form" onSubmit={(e) => { e.preventDefault(); handleSend(); }}>
+					<Input
+						placeholder="Type your message..."
+						value={input}
+						onChange={(e) => setInput(e.target.value)}
 						bg="white"
-						borderRadius="2xl"
-						boxShadow="lg"
-						p={8}
-					>
-						<Heading size="xl" mb={6} textAlign="center" color="gray.800">
-							🎯 Your Interest Profile
-						</Heading>
-
-						{/* MUSIC */}
-						<Box mb={8}>
-							<Heading size="md" mb={3} color="teal.600">
-								🎵 Music
-							</Heading>
-							<Text mb={1}>
-								<Text as="span" fontWeight="semibold">Mood:</Text>{" "}
-								{interests.data.interests.music.mood}
-							</Text>
-							<Text>
-								<Text as="span" fontWeight="semibold">Genres:</Text>{" "}
-								{interests.data.interests.music.genres.join(", ")}
-							</Text>
-						</Box>
-
-						{/* MOVIES */}
-						<Box mb={8}>
-							<Heading size="md" mb={3} color="teal.600">
-								🎬 Movies
-							</Heading>
-							<Text mb={1}>
-								<Text as="span" fontWeight="semibold">Genres:</Text>{" "}
-								{interests.data.interests.movies.genres.join(", ")}
-							</Text>
-							<Text mb={1}>
-								<Text as="span" fontWeight="semibold">Time Periods:</Text>{" "}
-								{interests.data.interests.movies.time_periods.join(", ")}
-							</Text>
-							<Text>
-								<Text as="span" fontWeight="semibold">Cultural Context:</Text>{" "}
-								{interests.data.interests.movies.cultural_context.join(", ")}
-							</Text>
-						</Box>
-
-						{/* HOBBIES */}
-						<Box>
-							<Heading size="md" mb={3} color="teal.600">
-								⛰️ Hobbies
-							</Heading>
-							<Text mb={1}>
-								<Text as="span" fontWeight="semibold">Lifestyle:</Text>{" "}
-								{interests.data.interests.hobbies.lifestyle}
-							</Text>
-							<Text mb={1}>
-								<Text as="span" fontWeight="semibold">Personality:</Text>{" "}
-								{interests.data.interests.hobbies.personality}
-							</Text>
-							<Text>
-								<Text as="span" fontWeight="semibold">Activities:</Text>{" "}
-								{interests.data.interests.hobbies.related_activities.join(", ")}
-							</Text>
-						</Box>
-					</Box>
-				</Container>
-			)}
-
+						color="black"
+						fontSize="lg"
+						height="48px"
+					/>
+					<Button type="submit" ml={2} colorScheme="gray">
+						Send
+					</Button>
+				</Flex>
+			</Box>
 		</Container>
 	);
 }

@@ -28,7 +28,7 @@ export default function WelcomeMessage({ user }) {
 				mb="0.5rem"
 				letterSpacing="-0.5px"
 			>
-				Please answer the question below to proceed.
+				Please talk to me to proceed.
 			</MotionHeading>
 		</Box>
 	);
