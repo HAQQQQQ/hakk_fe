@@ -46,7 +46,7 @@ export default function ChatBotDesktop() {
 			setBotTyping("");
 
 			typingIntervalRef.current = setInterval(() => {
-				setBotTyping((prev) => {
+				setBotTyping(() => {
 					const newText = response.slice(0, index + 1);
 					index++;
 					if (index === response.length) {
