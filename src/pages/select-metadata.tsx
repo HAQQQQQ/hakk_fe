@@ -48,8 +48,6 @@ export default function SelectRolePage() {
             body: JSON.stringify({ role }),
         });
 
-        debugger;
-
         if (res.ok) {
             router.push(role === 'coordinator' ? '/coordinator' : '/participant');
         } else {

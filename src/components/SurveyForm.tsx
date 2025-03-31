@@ -221,60 +221,71 @@ export default function SurveyForm() {
 			</VStack>
 
 			{interests && (
-				<Card mt={10} boxShadow="lg" borderRadius="xl" bg="black">
-					<CardHeader>
-						<Heading size="lg" color="black.600">
+				<Container maxW="4xl" mt={10}>
+					<Box
+						bg="white"
+						borderRadius="2xl"
+						boxShadow="lg"
+						p={8}
+					>
+						<Heading size="xl" mb={6} textAlign="center" color="gray.800">
 							🎯 Your Interest Profile
 						</Heading>
-					</CardHeader>
 
-					<CardBody>
 						{/* MUSIC */}
-						<Box mb={6}>
-							<Heading size="md" mb={2} color="teal.500">
+						<Box mb={8}>
+							<Heading size="md" mb={3} color="teal.600">
 								🎵 Music
 							</Heading>
-							<Text>
-								<Text as="span" fontWeight="bold">Mood:</Text> {interests.data.interests.music.mood}
+							<Text mb={1}>
+								<Text as="span" fontWeight="semibold">Mood:</Text>{" "}
+								{interests.data.interests.music.mood}
 							</Text>
 							<Text>
-								<Text as="span" fontWeight="bold">Genres:</Text> {interests.data.interests.music.genres.join(", ")}
+								<Text as="span" fontWeight="semibold">Genres:</Text>{" "}
+								{interests.data.interests.music.genres.join(", ")}
 							</Text>
 						</Box>
 
 						{/* MOVIES */}
-						<Box mb={6}>
-							<Heading size="md" mb={2} color="teal.500">
+						<Box mb={8}>
+							<Heading size="md" mb={3} color="teal.600">
 								🎬 Movies
 							</Heading>
-							<Text>
-								<Text as="span" fontWeight="bold">Genres:</Text> {interests.data.interests.movies.genres.join(", ")}
+							<Text mb={1}>
+								<Text as="span" fontWeight="semibold">Genres:</Text>{" "}
+								{interests.data.interests.movies.genres.join(", ")}
+							</Text>
+							<Text mb={1}>
+								<Text as="span" fontWeight="semibold">Time Periods:</Text>{" "}
+								{interests.data.interests.movies.time_periods.join(", ")}
 							</Text>
 							<Text>
-								<Text as="span" fontWeight="bold">Time Periods:</Text> {interests.data.interests.movies.time_periods.join(", ")}
-							</Text>
-							<Text>
-								<Text as="span" fontWeight="bold">Cultural Context:</Text> {interests.data.interests.movies.cultural_context.join(", ")}
+								<Text as="span" fontWeight="semibold">Cultural Context:</Text>{" "}
+								{interests.data.interests.movies.cultural_context.join(", ")}
 							</Text>
 						</Box>
 
 						{/* HOBBIES */}
 						<Box>
-							<Heading size="md" mb={2} color="teal.500">
+							<Heading size="md" mb={3} color="teal.600">
 								⛰️ Hobbies
 							</Heading>
-							<Text>
-								<Text as="span" fontWeight="bold">Lifestyle:</Text> {interests.data.interests.hobbies.lifestyle}
+							<Text mb={1}>
+								<Text as="span" fontWeight="semibold">Lifestyle:</Text>{" "}
+								{interests.data.interests.hobbies.lifestyle}
+							</Text>
+							<Text mb={1}>
+								<Text as="span" fontWeight="semibold">Personality:</Text>{" "}
+								{interests.data.interests.hobbies.personality}
 							</Text>
 							<Text>
-								<Text as="span" fontWeight="bold">Personality:</Text> {interests.data.interests.hobbies.personality}
-							</Text>
-							<Text>
-								<Text as="span" fontWeight="bold">Activities:</Text> {interests.data.interests.hobbies.related_activities.join(", ")}
+								<Text as="span" fontWeight="semibold">Activities:</Text>{" "}
+								{interests.data.interests.hobbies.related_activities.join(", ")}
 							</Text>
 						</Box>
-					</CardBody>
-				</Card>
+					</Box>
+				</Container>
 			)}
 
 		</Container>

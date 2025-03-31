@@ -1,6 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import {
+    Container,
+    VStack,
+    Box,
+    Heading,
+    Text,
+    Badge,
+    Flex,
+} from "@chakra-ui/react";
 
 export default function Coordinator() {
     const [events, setEvents] = useState([
@@ -21,38 +30,48 @@ export default function Coordinator() {
     ]);
 
     return (
-        <main className="min-h-screen p-8 bg-gray-50">
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">Event Portal</h1>
+        <Container maxW="6xl" py={10}>
+            <VStack align="stretch" spacing={6}>
+                <Heading size="6xl" textAlign="center" color="white.800" mb={4}>
+                    📅 Event Portal
+                </Heading>
 
-            <div className="grid gap-6">
                 {events.map((event) => (
-                    <div
+                    <Box
                         key={event.id}
-                        className="bg-white p-6 rounded-2xl shadow-md hover:shadow-lg transition"
+                        bg="white"
+                        p={6}
+                        borderRadius="2xl"
+                        boxShadow="md"
+                        _hover={{ boxShadow: "lg" }}
                     >
-                        <h2 className="text-xl font-semibold text-indigo-700">
+                        <Heading size="md" color="teal.600" mb={2}>
                             {event.title}
-                        </h2>
-                        <p className="text-gray-600 mt-2">
-                            📅 <strong>Date:</strong> {event.date}
-                        </p>
-                        <p className="text-gray-600">
-                            📍 <strong>Location:</strong> {event.location}
-                        </p>
-                        <p className="mt-2">
-              <span
-                  className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                      event.status === "Upcoming"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-gray-200 text-gray-600"
-                  }`}
-              >
-                {event.status}
-              </span>
-                        </p>
-                    </div>
+                        </Heading>
+
+                        <Flex direction="column" gap={1}>
+                            <Text color="gray.700">
+                                <strong>Date:</strong> {event.date}
+                            </Text>
+                            <Text color="gray.700">
+                                <strong>Location:</strong> {event.location}
+                            </Text>
+                            <Badge
+                                mt={2}
+                                variant="solid"
+                                colorScheme={event.status === "Upcoming" ? "green" : "gray"}
+                                alignSelf="flex-start"
+                                fontSize="0.9em"
+                                px={3}
+                                py={1}
+                                borderRadius="full"
+                            >
+                                {event.status}
+                            </Badge>
+                        </Flex>
+                    </Box>
                 ))}
-            </div>
-        </main>
+            </VStack>
+        </Container>
     );
 }
