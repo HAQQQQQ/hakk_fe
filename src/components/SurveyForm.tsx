@@ -24,12 +24,12 @@ export default function ChatBotDesktop() {
 		const response = await fetch("https://api.coze.com/v3/chat", {
 			method: "POST",
 			headers: {
-				Authorization: "Bearer ${process.env.NEXT_PUBLIC_COZE_API_KEY}",
+				Authorization: `Bearer ${process.env.NEXT_PUBLIC_COZE_API_KEY}`,
 				"Content-Type": "application/json"
 			},
 			body: JSON.stringify({
-				bot_id: "process.env.NEXT_PUBLIC_COZE_BOT_ID",
-				user_id: "process.env.NEXT_PUBLIC_COZE_USER_ID",
+				bot_id: process.env.NEXT_PUBLIC_COZE_BOT_ID,
+				user_id: process.env.NEXT_PUBLIC_COZE_USER_ID,
 				stream: false,
 				auto_save_history: true,
 				additional_messages: [
