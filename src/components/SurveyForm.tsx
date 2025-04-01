@@ -144,9 +144,9 @@ export default function ChatBotDesktop() {
 		}
 	}, [messages, botTyping]);
 
-	// Styling for a sleek, futuristic look.
+	// Sleek/futuristic color palette
 	const containerBg = "black";
-	const chatBg = "#1a1a1a";
+	const chatBg = "#2c2c2c"; // Slightly lighter than pure black
 	const botBubbleStyles = {
 		alignSelf: "flex-start",
 		bg: "#333",
@@ -172,13 +172,15 @@ export default function ChatBotDesktop() {
 		<Container maxW="800px" py={8}>
 			<Box
 				bg={containerBg}
-				borderRadius="lg"
+				border="2px solid #666"    // Outline around the entire component
+				borderRadius="lg"         // Rounded corners
 				boxShadow="2xl"
 				p={4}
 				height="600px"
 				display="flex"
 				flexDirection="column"
 			>
+				{/* Chat messages container */}
 				<Box
 					ref={chatContainerRef}
 					flex="1"
@@ -190,7 +192,10 @@ export default function ChatBotDesktop() {
 				>
 					<VStack align="stretch">
 						{messages.map((msg, i) => (
-							<Box key={i} {...(msg.sender === "bot" ? botBubbleStyles : userBubbleStyles)}>
+							<Box
+								key={i}
+								{...(msg.sender === "bot" ? botBubbleStyles : userBubbleStyles)}
+							>
 								<Text>{msg.text}</Text>
 							</Box>
 						))}
@@ -201,6 +206,8 @@ export default function ChatBotDesktop() {
 						)}
 					</VStack>
 				</Box>
+
+				{/* Input + Button */}
 				<Flex
 					as="form"
 					onSubmit={(e) => {
@@ -220,7 +227,16 @@ export default function ChatBotDesktop() {
 						border="none"
 						_focus={{ boxShadow: "outline" }}
 					/>
-					<Button type="submit" ml={2} colorScheme="gray" variant="outline">
+					<Button
+						type="submit"
+						ml={2}
+						// Metallic gray gradient
+						bgGradient="linear(to-r, gray.500, gray.600)"
+						color="white"
+						_hover={{ bgGradient: "linear(to-r, gray.600, gray.700)" }}
+						borderRadius="md"
+						border="1px solid #777"
+					>
 						Send
 					</Button>
 				</Flex>
