@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Box, Button, Flex, VStack, Heading, chakra } from "@chakra-ui/react";
+import { Box, Button, Flex, VStack, Heading, chakra, Link } from "@chakra-ui/react";
 
 // Create a Chakra-enabled video element for proper prop support
 const Video = chakra("video");
@@ -59,7 +59,7 @@ export default function VideoCapture() {
 
     return (
         <Box maxW="600px" mx="auto" py={6}>
-            <VStack spacing={4} align="stretch">
+            <VStack gap={4} align="stretch">
                 <Heading size="md" textAlign="center">
                     Webcam Video Capture
                 </Heading>
@@ -83,18 +83,14 @@ export default function VideoCapture() {
                 </Flex>
 
                 {/* Playback & Download */}
+
                 {videoURL && (
-                    <VStack spacing={2} align="stretch">
+                    <VStack gap={2} align="stretch">
                         <Heading size="sm">Recorded Video</Heading>
-                        <Video src={videoURL} controls width="100%" borderRadius="md" boxShadow="lg" />
-                        <Button
-                            as="a"
-                            href={videoURL}
-                            download="recording.webm"
-                            colorScheme="blue"
-                        >
-                            Download Recording
-                        </Button>
+                        <Video src={videoURL} controls w="100%" borderRadius="md" boxShadow="lg" />
+                        <Link href={videoURL} download="recording.webm">
+                            <Button colorScheme="blue">Download Recording</Button>
+                        </Link>
                     </VStack>
                 )}
             </VStack>
