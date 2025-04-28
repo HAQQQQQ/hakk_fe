@@ -2,6 +2,7 @@ import { SignedIn, useSession, useUser } from "@clerk/nextjs";
 import WelcomeMessage from "@/components/WelcomeMessage";
 import SurveyForm from "@/components/SurveyForm";
 import { useProfile } from "@/hooks/useProfile";
+import VideoCapture from "@/components/VideoCapture";
 
 export default function ParticipantPage() {
     const { session } = useSession();
@@ -12,7 +13,7 @@ export default function ParticipantPage() {
     return (
         <SignedIn>
             <WelcomeMessage user={user} />
-            <SurveyForm />
+                <VideoCapture></VideoCapture>
         </SignedIn>
     );
 }
