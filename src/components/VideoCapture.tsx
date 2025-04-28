@@ -98,7 +98,6 @@ export default function VideoCapture() {
                             </Link>
                             <Button
                                 onClick={uploadToSupabase}
-                                isLoading={uploading}
                                 colorScheme="green"
                             >
                                 Upload to Supabase
@@ -109,7 +108,6 @@ export default function VideoCapture() {
                                 Uploaded to:{" "}
                                 <Link
                                     href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video-logs/${uploadedPath}`}
-                                    isExternal
                                 >
                                     {uploadedPath}
                                 </Link>
