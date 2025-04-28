@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
-import { Box, Button, Flex, VStack, Heading, chakra, Link } from "@chakra-ui/react";
+import { Box, Button, Flex, VStack, Heading, chakra, Link, Text } from "@chakra-ui/react";
+import { supabase } from "../lib/supabase";  // adjust path as needed
 
-// Create a Chakra-enabled video element for proper prop support
 const Video = chakra("video");
 
 export default function VideoCapture() {
@@ -9,26 +9,24 @@ export default function VideoCapture() {
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const [stream, setStream] = useState<MediaStream | null>(null);
     const [recording, setRecording] = useState(false);
-    const [videoURL, setVideoURL] = useState("");
+    const [videoURL, setVideoURL] = useState<string>("");
+    const [uploading, setUploading] = useState(false);
+    const [uploadedPath, setUploadedPath] = useState<string | null>(null);
     const chunksRef = useRef<Blob[]>([]);
 
-    // Request webcam access once on mount
     useEffect(() => {
         navigator.mediaDevices
             .getUserMedia({ video: true, audio: true })
             .then((mediaStream) => {
                 setStream(mediaStream);
-                if (videoRef.current) {
-                    videoRef.current.srcObject = mediaStream;
-                }
+                if (videoRef.current) videoRef.current.srcObject = mediaStream;
             })
             .catch((err) => console.error("Error accessing webcam:", err));
 
         return () => {
-            // Stop tracks when component unmounts
-            stream?.getTracks().forEach((track) => track.stop());
+            stream?.getTracks().forEach((t) => t.stop());
         };
-    }, []); // <-- empty deps ensures this runs only once
+    }, []);
 
     const startRecording = () => {
         if (!stream) return;
@@ -36,16 +34,12 @@ export default function VideoCapture() {
         mediaRecorderRef.current = recorder;
         chunksRef.current = [];
 
-        recorder.ondataavailable = (event) => {
-            if (event.data.size > 0) {
-                chunksRef.current.push(event.data);
-            }
+        recorder.ondataavailable = (e) => {
+            if (e.data.size > 0) chunksRef.current.push(e.data);
         };
-
         recorder.onstop = () => {
             const blob = new Blob(chunksRef.current, { type: "video/webm" });
-            const url = URL.createObjectURL(blob);
-            setVideoURL(url);
+            setVideoURL(URL.createObjectURL(blob));
         };
 
         recorder.start();
@@ -57,40 +51,70 @@ export default function VideoCapture() {
         setRecording(false);
     };
 
+    const uploadToSupabase = async () => {
+        if (!chunksRef.current.length) return;
+        setUploading(true);
+
+        const blob = new Blob(chunksRef.current, { type: "video/webm" });
+        const fileName = `recordings/${Date.now()}.webm`;
+
+        const { data, error } = await supabase
+            .storage
+            .from("video-logs")      // ← your bucket name here
+            .upload(fileName, blob, { cacheControl: "3600", upsert: false });
+
+        setUploading(false);
+
+        if (error) {
+            console.error("Upload error:", error);
+            return;
+        }
+        setUploadedPath(data.path);
+    };
+
     return (
         <Box maxW="600px" mx="auto" py={6}>
             <VStack gap={4} align="stretch">
-                <Heading size="md" textAlign="center">
-                    Webcam Video Capture
-                </Heading>
+                <Heading size="md" textAlign="center">Webcam Video Capture</Heading>
 
-                {/* Live preview */}
                 <Box borderRadius="lg" overflow="hidden" boxShadow="2xl" bg="black">
                     <Video ref={videoRef} autoPlay playsInline muted width="100%" />
                 </Box>
 
-                {/* Controls */}
                 <Flex justify="center" gap={4}>
-                    {!recording ? (
-                        <Button onClick={startRecording} colorScheme="red">
-                            Start Recording
-                        </Button>
-                    ) : (
-                        <Button onClick={stopRecording} colorScheme="gray">
-                            Stop Recording
-                        </Button>
-                    )}
+                    {!recording
+                        ? <Button onClick={startRecording} colorScheme="red">Start Recording</Button>
+                        : <Button onClick={stopRecording} colorScheme="gray">Stop Recording</Button>
+                    }
                 </Flex>
-
-                {/* Playback & Download */}
 
                 {videoURL && (
                     <VStack gap={2} align="stretch">
                         <Heading size="sm">Recorded Video</Heading>
                         <Video src={videoURL} controls w="100%" borderRadius="md" boxShadow="lg" />
-                        <Link href={videoURL} download="recording.webm">
-                            <Button colorScheme="blue">Download Recording</Button>
-                        </Link>
+                        <Flex gap={2}>
+                            <Link href={videoURL} download="recording.webm">
+                                <Button colorScheme="blue">Download</Button>
+                            </Link>
+                            <Button
+                                onClick={uploadToSupabase}
+                                isLoading={uploading}
+                                colorScheme="green"
+                            >
+                                Upload to Supabase
+                            </Button>
+                        </Flex>
+                        {uploadedPath && (
+                            <Text fontSize="sm">
+                                Uploaded to:{" "}
+                                <Link
+                                    href={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/video-logs/${uploadedPath}`}
+                                    isExternal
+                                >
+                                    {uploadedPath}
+                                </Link>
+                            </Text>
+                        )}
                     </VStack>
                 )}
             </VStack>

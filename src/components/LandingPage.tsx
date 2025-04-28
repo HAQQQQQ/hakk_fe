@@ -40,7 +40,7 @@ const LandingPage = () => {
 			>
 				{/* Left Image */}
 				<MotionImage
-					src="/assets/speeddating1.jpg"
+					src="/assets/tradingimage1.jpg"
 					alt="Banner Left"
 					objectFit="cover"
 					w={{ base: "100%", md: "50%" }}
@@ -51,7 +51,7 @@ const LandingPage = () => {
 
 				{/* Right Image */}
 				<MotionImage
-					src="/assets/speeddating2.jpg"
+					src="/assets/tradingimage2.jpg"
 					alt="Banner Right"
 					objectFit="cover"
 					w={{ base: "100%", md: "50%" }}
@@ -70,7 +70,7 @@ const LandingPage = () => {
 				transition={{ duration: 3 }}
 				viewport={{ once: true }}
 			>
-				Speed dating optimized.
+				Trade logs made passive.
 			</MotionHeading>
 			{/* Secondary Message - fixed near bottom of viewport */}
 			<MotionHeading
@@ -81,7 +81,7 @@ const LandingPage = () => {
 				transition={{ duration: 1, delay: 0.3 }}
 				viewport={{ once: true }}
 			>
-				Matching has never been easier.
+				Log your trades like never before.
 			</MotionHeading>
 		</Box>
 	);
