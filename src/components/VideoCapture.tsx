@@ -99,11 +99,9 @@ export default function VideoCapture() {
                             <Button
                                 onClick={uploadToSupabase}
                                 colorScheme="green"
-                                isDisabled={uploading}           // disable while uploading
+                                loading={uploading}           // ← instead of `isLoading`
+                                loadingText="Uploading…"      // ← optional companion text
                             >
-                                {uploading && (
-                                    <Spinner size="sm" mr={2} />   // little spinner left of the text
-                                )}
                                 Upload to Supabase
                             </Button>
                         </Flex>
