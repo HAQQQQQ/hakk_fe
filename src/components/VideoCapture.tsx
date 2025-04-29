@@ -40,7 +40,7 @@ export default function VideoCapture() {
                 setStream(mediaStream);
                 if (videoRef.current) {
                     videoRef.current.srcObject = mediaStream;
-                    videoRef.current.play().catch(_ => {
+                    videoRef.current.play().catch(() => {
                     });
                 }
             }).catch(err => console.error('Error accessing webcam:', err));

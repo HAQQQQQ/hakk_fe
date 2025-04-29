@@ -1,10 +1,17 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-	/* config options here */
 	reactStrictMode: true,
 	typescript: {
 		ignoreBuildErrors: true,
+	},
+	webpack(config) {
+		config.resolve.fallback = {
+			fs: false,
+			path: false,
+			os: false,
+		};
+		return config;
 	},
 };
 
