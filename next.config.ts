@@ -1,11 +1,12 @@
-import type { NextConfig } from 'next';
-
-const nextConfig: NextConfig = {
+// next.config.js
+/** @type {import('next').NextConfig} */
+const nextConfig = {
 	reactStrictMode: true,
 	typescript: {
 		ignoreBuildErrors: true,
 	},
 	webpack(config) {
+		// stub out Node-only modules so face-api’s Node bits don’t get bundled
 		config.resolve.fallback = {
 			fs: false,
 			path: false,
@@ -15,4 +16,4 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default nextConfig;
+module.exports = nextConfig;
