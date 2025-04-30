@@ -127,7 +127,7 @@ export default function VideoCapture() {
         return () => recog.stop();
     }, []);
 
-    // ─── Recording & chunked upload ──────────────────────────────────────────────
+// ─── Recording & chunked upload ──────────────────────────────────────────────
     const startRecording = useCallback(() => {
         console.log(`Session ID: ${sessionIdRef.current}`);
         if (!stream) return;
@@ -146,8 +146,11 @@ export default function VideoCapture() {
             const { error } = await supabase.storage
                 .from("video-logs")
                 .upload(chunkName, e.data, { cacheControl: "3600", upsert: false });
-            if (error) console.error(`❌ Chunk #${chunkIndex} upload failed:`, error);
-            else console.log(`✅ Chunk #${chunkIndex} uploaded.`);
+            if (error) {
+                console.error(`❌ Chunk #${chunkIndex} upload failed:`, error);
+            } else {
+                console.log(`✅ Chunk #${chunkIndex} uploaded.`);
+            }
             chunkIndex++;
         };
 
@@ -156,9 +159,31 @@ export default function VideoCapture() {
         setRecording(true);
     }, [stream]);
 
-    const stopRecording = useCallback(() => {
+    const stopRecording = useCallback(async () => {
+        // 1) Stop the recorder
         mediaRecorderRef.current?.stop();
         setRecording(false);
+
+        // 2) Call your stitch Edge Function
+        try {
+            const res = await fetch(
+                "https://gwkicsyxtquqxjnhwfrd.functions.supabase.co/stitch",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ sessionId: sessionIdRef.current }),
+                }
+            );
+            const { url, error } = await res.json();
+            if (error) {
+                console.error("❌ Stitch failed:", error);
+            } else {
+                console.log("✅ Stitch complete, final video URL:", url);
+                // you can now save `url` to your DB or show it to the user
+            }
+        } catch (err) {
+            console.error("❌ Error calling stitch function:", err);
+        }
     }, []);
 
     return (
